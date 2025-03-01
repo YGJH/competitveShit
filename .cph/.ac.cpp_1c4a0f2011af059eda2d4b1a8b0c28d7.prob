@@ -1,1 +1,0 @@
-{"name":"Local: ac","url":"c:\\D_disk\\c-_project\\ac.cpp","tests":[{"id":1738522445226,"input":"20 4\n3 7 8 4\n","output":"777773\n"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"c:\\D_disk\\c-_project\\ac.cpp","group":"local","local":true}

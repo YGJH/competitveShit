@@ -1,1 +1,0 @@
-{"name":"Local: i","url":"c:\\Users\\jihut\\Desktop\\c-_project\\src\\contest\\i.cpp","tests":[{"id":1726889356734,"input":"2\n4\n3\n0 1\n2 1\n3 1\n5\n4\n0 1\n1 2\n2 3\n3 4","output":"3\n1"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"c:\\Users\\jihut\\Desktop\\c-_project\\src\\contest\\i.cpp","group":"local","local":true}

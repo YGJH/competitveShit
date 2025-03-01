@@ -1,0 +1,12 @@
+
+
+### 如何刪除此資料夾下所有的.out檔案
+```powershell
+Get-ChildItem -Path . -Filter *.out -Recurse | Remove-Item -Force
+```
+```cmd
+del /s /q *.out
+```
+```bash
+find . -name "*.out" -type f -delete
+```

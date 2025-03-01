@@ -1,1 +1,0 @@
-{"name":"Local: 8puzzle","url":"/home/charles/Documents/c-_project/problems/8puzzle.cpp","tests":[{"id":1712920695432,"input":"3\n\n1 2 3\n4 5 6\n8 7 0\n\n1 2 3\n4 5 6\n7 0 8\n\n1 3 2\n4 6 5\n7 8 0","output":""}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"/home/charles/Documents/c-_project/problems/8puzzle.cpp","group":"local","local":true}

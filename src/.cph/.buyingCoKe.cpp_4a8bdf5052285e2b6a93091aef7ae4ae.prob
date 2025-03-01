@@ -1,1 +1,0 @@
-{"name":"Local: buyingCoKe","url":"d:\\c-_project\\src\\buyingCoKe.cpp","tests":[{"id":1736262579691,"input":"3\n2 2 1 1\n2 1 4 1\n20 200 3 0","output":"5\n3\n148\n"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"d:\\c-_project\\src\\buyingCoKe.cpp","group":"local","local":true}

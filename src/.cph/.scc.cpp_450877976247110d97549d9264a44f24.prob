@@ -1,1 +1,0 @@
-{"name":"Local: scc","url":"c:\\Users\\jihut\\Desktop\\c-_project\\new_folder\\scc.cpp","tests":[{"id":1722262738145,"input":"4 4\n4 5 2 7\n1 2\n2 1\n1 3\n2 4\n","output":""}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"c:\\Users\\jihut\\Desktop\\c-_project\\new_folder\\scc.cpp","group":"local","local":true}

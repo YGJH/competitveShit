@@ -15,6 +15,17 @@
 	// 	],
 	// 	"description": "Log output to console"
 	// }
+	"godcode" : {
+		"prefix": "godcode",
+		"body": [
+			"#pragma GCC optimize(\"O3,unroll-loops\")",
+			"#pragma GCC target(\"avx2,bmi,bmi2,lzcnt,popcnt\")",
+			"mt19937 gen(chrono::steady_clock::now().time_since_epoch().count());",
+			"int randint(int lb, int ub)",
+			"{ return uniform_int_distribution<int>(lb, ub)(gen); }",
+		],
+		"description": "godcode"
+	},
 	"ishowspeed": {
 		"prefix": [
 			"ishowspeed"

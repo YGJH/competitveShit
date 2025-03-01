@@ -1,1 +1,0 @@
-{"name":"Local: b","url":"c:\\Users\\jihut\\Desktop\\c-_project\\src\\treap\\b.cpp","tests":[{"id":1726071045983,"input":"7 2\nAYBABTU\n3 4\n4 7","output":"AYAUTBB"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"c:\\Users\\jihut\\Desktop\\c-_project\\src\\treap\\b.cpp","group":"local","local":true}

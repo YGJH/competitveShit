@@ -1,1 +1,0 @@
-{"name":"Local: rotating_kake","url":"c:\\Users\\jihut\\Desktop\\c-_project\\src\\contest\\rotating_kake.cpp","tests":[{"id":1726465160116,"input":"3 10\n0 0\n10 0\n0 10","output":"7.0710678118654755"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"c:\\Users\\jihut\\Desktop\\c-_project\\src\\contest\\rotating_kake.cpp","group":"local","local":true}

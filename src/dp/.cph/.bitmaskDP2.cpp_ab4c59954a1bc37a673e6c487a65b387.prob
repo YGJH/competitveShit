@@ -1,1 +1,0 @@
-{"name":"Local: bitmaskDP2","url":"c:\\Users\\jihut\\Desktop\\c-_project\\src\\dp\\bitmaskDP2.cpp","tests":[{"id":1725884956552,"input":"4 10\n4 8 6 1","output":"2"},{"id":1725885960803,"input":"2 1\n1 1","output":"2"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"c:\\Users\\jihut\\Desktop\\c-_project\\src\\dp\\bitmaskDP2.cpp","group":"local","local":true}

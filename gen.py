@@ -1,18 +1,15 @@
+#!/usr/bin/python3
 import os
 from itertools import permutations 
 import random
-word = "abcdefghijklmnopqrstuvwxyz"
-word = list(word) 
+# word = "abcdefghijklmnopqrstuvwxyz!@#$%^&*()-=_+{}[];'0987654321"
+testCase = random.randint(1 , 10)
+# k = random.randint(-10 , 10)
 with open('input' , 'w') as f:
-    dic = dict()
-    for i in range(100):
-        random.shuffle(word)
-        string = word[:random.randint(15, 15)]
-        f.write("".join(string) + '\n')
-        dic["".join(string)] = 1
-    f.write('\n')
-    for i in range(100):
-        a = random.choice(list(dic.keys()))
-        b = random.choice(list(dic.keys()))
-        f.write(a + ' ' + b + '\n')
+# word = list(word)
+# random.shuffle(word)
+# print("".join(word[:10]))
+    f.write(str(testCase) + '\n')
+    for i in range(testCase):
+        f.write(str(random.randint(1 , 30))+ (' ' if i != testCase-1 else '\n'))
     f.close()

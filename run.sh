@@ -1,5 +1,5 @@
 #!/bin/bash
-
+clear
 # 編譯程式，並檢查是否成功
 if ! g++ -std=c++17 -O2 ac.cpp -o ac; then
     echo "編譯 ac.cpp 失敗"
