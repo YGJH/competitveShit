@@ -1,81 +1,80 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
- 
-// Use 64-bit integer type for counts and answer.
-using ll = long long;
- 
-// Fenwick Tree (BIT) for point updates and prefix sum queries.
-struct BIT {
-    vector<ll> tree;
-    int n;
-    BIT(int n) : n(n), tree(n+1, 0) { }
-    
-    // Increase the value at index idx by delta.
-    void update(int idx, ll delta) {
-        for(; idx <= n; idx += idx & -idx)
-            tree[idx] += delta;
-    }
-    
-    // Query the prefix sum from 1 to idx.
-    ll query(int idx) {
-        ll res = 0;
-        for(; idx > 0; idx -= idx & -idx)
-            res += tree[idx];
-        return res;
-    }
+
+// 邊的結構表示法
+struct Edge {
+    int u, v, w;
 };
- 
-int main(){
-    ios_base::sync_with_stdio(false);
+
+// 使用 path compression 找到集合代表元素
+int findParent(vector<int> &parent, int i) {
+    if (parent[i] != i)
+        parent[i] = findParent(parent, parent[i]);
+    return parent[i];
+}
+
+// 使用 union by rank 合併兩個集合
+void unionSet(vector<int> &parent, vector<int> &rank, int x, int y) {
+    int xroot = findParent(parent, x);
+    int yroot = findParent(parent, y);
+    if (xroot == yroot)
+        return;
+    if (rank[xroot] < rank[yroot]) {
+        parent[xroot] = yroot;
+    } else if (rank[xroot] > rank[yroot]) {
+        parent[yroot] = xroot;
+    } else {
+        parent[yroot] = xroot;
+        rank[xroot]++;
+    }
+}
+#ifdef LOCAL
+void debug() {}
+template<class T> void debug(T var) { cerr << var; }
+template<class T, class ...P> void debug(T var, P ...t) { cerr << var << ", "; debug(t...); }
+template<class T> void org(T l, T r) { while(l != r) cerr << *l++ << ' '; }
+#define de(...) { cerr << "[Line: " << __LINE__ << "][" << #__VA_ARGS__ << "] -> [", debug(__VA_ARGS__), cerr << "]\n"; }
+#define orange(...) { cerr << "[Line: " << __LINE__ << "][" << #__VA_ARGS__ << "] -> [", org(__VA_ARGS__), cerr << "]\n"; }
+#else
+#define de(...) ((void)0)
+#define orange(...) ((void)0)
+#endif
+int main() {
+    ios::sync_with_stdio(false);
     cin.tie(nullptr);
- 
-    int n;
-    cin >> n;
-    vector<int> a(n);
-    for (int i = 0; i < n; i++){
-        cin >> a[i];
+
+    int N, M;
+    cin >> N >> M;
+    // assert(N <= 100000 && M <= N + 300);
+    vector<Edge> edges(M);
+    for (int i = 0; i < M; i++) {
+        cin >> edges[i].u >> edges[i].v >> edges[i].w;
     }
     
-    // Since all powers are distinct but can be up to 1e9,
-    // we perform coordinate compression.
-    vector<int> comp = a;
-    sort(comp.begin(), comp.end());
-    comp.erase(unique(comp.begin(), comp.end()), comp.end());
-    
-    // Replace each a[i] with its compressed value (1-indexed).
-    for (int i = 0; i < n; i++){
-        a[i] = lower_bound(comp.begin(), comp.end(), a[i]) - comp.begin() + 1;
+    // 依照邊的權重由小到大排序
+    sort(edges.begin(), edges.end(), [](const Edge &a, const Edge &b) {
+        return a.w < b.w;
+    });
+
+    // 初始化 Union-Find 結構
+    vector<int> parent(N), rank(N, 0);
+    for (int i = 0; i < N; i++) {
+        parent[i] = i;
     }
-    
-    int m = comp.size();
-    
-    // Compute L: For each j, count how many i < j have a[i] > a[j].
-    vector<ll> L(n, 0);
-    BIT bitL(m);
-    for (int j = 0; j < n; j++){
-        // Query the number of elements seen so far that are greater than a[j].
-        // That is: total count so far minus count up to a[j].
-        L[j] = bitL.query(m) - bitL.query(a[j]);
-        bitL.update(a[j], 1);
+
+    int mst_weight = 0;
+    // 逐一加入邊，檢查是否會產生 cycle
+    for (int i = 0; i < M; i++) {
+        int u = edges[i].u;
+        int v = edges[i].v;
+        int w = edges[i].w;
+        if (findParent(parent, u) != findParent(parent, v)) {
+            mst_weight += w;
+            // de(u , v , w);
+            unionSet(parent, rank, u, v);
+        }
     }
-    
-    // Compute R: For each j, count how many k > j have a[k] < a[j].
-    vector<ll> R(n, 0);
-    BIT bitR(m);
-    for (int j = n - 1; j >= 0; j--){
-        // Query the number of elements to the right that are less than a[j].
-        R[j] = bitR.query(a[j] - 1);
-        bitR.update(a[j], 1);
-    }
-    
-    // Sum over j: L[j] * R[j]
-    ll answer = 0;
-    for (int j = 0; j < n; j++){
-        answer += L[j] * R[j];
-    }
-    
-    cout << answer << "\n";
+
+    cout << "The cost of minimum spanning tree: " << mst_weight << "\n";
     return 0;
 }

@@ -124,77 +124,53 @@ inline void flush() { fwrite(obuf, p3 - obuf, 1, stdout); }
 } // namespace IO
 using IO::read;
 using IO::write;
-constexpr int digitCost[] = {0, 2, 5, 5, 4, 5, 6, 3, 7, 6};
-							  //1  2  3  4  5  6  7  8  9
 
-#define max(a,b) (a>b)?a:b
-
-void mp(string &oldString, string &now, char digit , int i) {
-	
-	int lenNow = now.length();
-	int lenOld = oldString.length();
-	string first_part ="" , second_part ="";
-	first_part.reserve(lenOld), second_part.reserve(lenOld);
-	int cost = 0;
-	if(oldString.empty()) {
-		first_part.push_back(digit);
-		cost += digitCost[digit - '0'];
-	}else {
-		int i ;
-		for(i = 0 ; i < lenOld ; i++) {
-			if(oldString[i] >= digit) {
-				cost += digitCost[oldString[i]-'0'];
-				first_part.push_back(oldString[i]);
-			} else {
-				break;
-			}
-		}
-		first_part.push_back(digit);
-		cost += digitCost[digit-'0'];
-		for(; i < lenOld ; i++) {
-			cost += digitCost[oldString[i]-'0'];
-			second_part.push_back(oldString[i]);
-		}
-	}
-	if(cost < i) return;
-	auto len = (first_part + second_part).length();
-	// de(first_part+second_part , len , i  , cost , now );
-	if(len < lenNow) {
-		return ;
-	}
-	else if((first_part+second_part) > now){
-		now = first_part + second_part;
-		return ;
-	}
+inline int getConcentration(int a, int b) {
+	return (a && b) ? b / (a + b) : 0;
 }
-
+struct node {
+	long double cell;
+	int first, second;
+};
+bool cmp(auto &a , auto &b) {
+	return a.first * b.second > a.second * b.first;
+}
 i32 main() {
-
-	ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
-	int maxSticks, numSticks;
-
-	cin >> maxSticks >> numSticks;
-
-	vector<char> sticks(numSticks);
-	for (auto &stick : sticks) {
-		cin >> stick;
-	}
-	sort(all(sticks),[&](auto &a , auto &b) {
-		return digitCost[a-'0'] < digitCost[b-'0'];
-	});
-
-	vector<string> dp(maxSticks + 3);
-	dp[0] = "";dp[1] = "";
-	for (int i = 2; i <= maxSticks; i++) {
-		dp[i] = "";
-		for (auto &j : sticks) {
-			// de(digitCost[j-'0'] , j);
-			if (i - digitCost[j-'0'] >= 0) {
-				mp(dp[i - digitCost[j-'0']], dp[i] , j , i);
+	int a, b, c, d, e, f;
+	read(a, b, c, d, e, f);
+	vector<pair<int,int>> mx;mx.reserve(1e5);
+	for(int i = 0 ; ; i++) {
+		auto p = i * a;
+		if(p * 100 > f) break;
+		for(int j = 0 ; ; j++) {
+			if(i || j) {
+				auto water = p + j * b;
+				auto waterWeight = (p + j * b) * 100;
+				if(waterWeight > f) break;
+				de(water);
+				for(int k = 0 ;  ; k++) {
+					auto now = k * c ;
+					if(now + waterWeight > f || e * water < k) break;
+					for(int l = 0 ; ; l++) {
+						auto sugarWeight = l * d + now;
+						if(sugarWeight + waterWeight > f) break;
+						if(e * water < sugarWeight) {
+							break;
+						}
+						mx.push_back({waterWeight , sugarWeight});
+					}
+				}
 			}
 		}
 	}
-
-	cout << dp[maxSticks] << endl;
+	auto n = mx[0];
+	for(auto i = 1 ; i < mx.size() ; i++) {
+		if(cmp(n , mx[i])) {
+			n = mx[i];
+		}
+	}
+	write(n.second , ' ');
+	write(n.first);
+	IO::flush();
 	return 0;
 }

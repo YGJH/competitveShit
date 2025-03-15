@@ -1,12 +1,12 @@
 #!/bin/bash
 clear
 # 編譯程式，並檢查是否成功
-if ! g++ -std=c++17 -O2 ac.cpp -o ac; then
+if ! g++ -std=c++17 -O3 -Wfatal-errors ac.cpp -o ac; then
     echo "編譯 ac.cpp 失敗"
     exit 1
 fi
 
-if ! g++ -std=c++17 -O2 wa.cpp -o wa; then
+if ! g++ -std=c++17 -O3 -Wfatal-errors wa.cpp -o wa; then
     echo "編譯 wa.cpp 失敗"
     exit 1
 fi
@@ -40,14 +40,14 @@ while true; do
     
     # 比較輸出
     if ! diff -Z -B ac.out wa.out > /dev/null; then
-        echo "找到不同！在測試 #$count"
-        echo "=== 輸入 ==="
+        echo -e "找到不同！在測試 #$count"
+        echo -e "=== 輸入 ==="
         cat input
-        echo "=== AC 輸出 ==="
+        echo -e "=== AC 輸出 ==="
         cat ac.out
-        echo "=== WA 輸出 ==="
+        echo -e "=== WA 輸出 ==="
         cat wa.out
-        echo "=== 差異 ==="
+        echo -e "=== 差異 ==="
         diff -y ac.out wa.out
         break
     fi
