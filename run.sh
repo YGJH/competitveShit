@@ -20,12 +20,12 @@ while true; do
     echo "執行測試 #$count"
     
     # 生成測試資料
-    python3 gen.py > input || { echo "生成測試資料失敗"; exit 1; }
+    python3 gen.py > in || { echo "生成測試資料失敗"; exit 1; }
     
     # 執行兩個程式
-    timeout 1s ./ac < input > ac.out
+    timeout 1s ./ac < in > ac.out
     AC_STATUS=$?
-    timeout 1s ./wa < input > wa.out
+    timeout 1s ./wa < in > wa.out
     WA_STATUS=$?
     
     # 檢查程式是否超時
@@ -42,7 +42,7 @@ while true; do
     if ! diff -Z -B ac.out wa.out > /dev/null; then
         echo -e "找到不同！在測試 #$count"
         echo -e "=== 輸入 ==="
-        cat input
+        cat in
         echo -e "=== AC 輸出 ==="
         cat ac.out
         echo -e "=== WA 輸出 ==="

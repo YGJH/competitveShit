@@ -10,7 +10,7 @@ fi
 
 # 獲取從命令行參數傳入的檔案名稱
 name=$1
-rm a.out
+rm a.out output.out
 echo "編譯源碼檔案: $name"
 g++ $name -O3 -w -Wfatal-errors -Wall -Wshadow -fsanitize=undefined -DLOCAL
-./a.out < input
+./a.out < 1.in

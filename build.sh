@@ -13,4 +13,4 @@ name=$1
 rm a.out
 echo "編譯源碼檔案: $name"
 g++ $name -O3 -w -Wfatal-errors -Wall -Wshadow -fsanitize=undefined -DLOCAL
-./a.out < input
+./a.out < in

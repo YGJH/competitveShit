@@ -1,13 +1,14 @@
 #!/usr/bin/python3
 
 import random as rd
-
-
-with open("input" , "w") as f:
-    n = rd.randint(1, 100000)
-    m = rd.randint(1 , n+300)
-    f.write(f'{n} {m}\n')
-    for _ in range(m):
-        u , v, w = rd.randint(0, n-1), rd.randint(0 , n-1) , rd.randint(1, 10000)
-        f.write(f'{u} {v} {w}\n')
-    f.close()
+import itertools as it
+import math
+t = rd.randint(4,5)
+with open('in' , 'w') as f:
+    f.write(str(t)+'\n')
+    for i in range(t):
+        n = rd.randint(1,5)
+        f.write(str(n)+'\n')
+        for j in range(n):
+            f.write(str(rd.randint(0, 10))+' ')
+        f.write('\n')

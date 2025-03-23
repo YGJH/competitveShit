@@ -106,7 +106,7 @@ int main(){
         sort(factors.begin(), factors.end());
         // 輸出格式：第一個數為因數個數，其後依序輸出所有因數
         cout << factors.size();
-        for(auto p : factors) {
+        for(auto &p : factors) {
             cout << " " << p;
         }
         cout << "\n";

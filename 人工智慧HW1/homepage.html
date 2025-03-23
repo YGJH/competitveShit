@@ -1,0 +1,757 @@
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+<title>Artificial Intelligence</title>
+<style>
+.gridTD { border: 1px solid black; width: 18px; height: 18px; text-align: center; }
+.coordTD {
+	border: 0px;
+	width: 18px;
+	height: 18px;
+	text-align: center;
+}
+</style>
+</head>
+<body bgcolor="#CCFFCC">
+<h2 align=middle>人工智慧 1132 - 作業說明 [Artificial Intelligence 1132 - Assignments]</h2>
+<p><table border=1 cellpadding=5 width=100%>
+<tr><td>
+<ul type=square>
+<li><p>Project 1: <a href="#prj1">8-Puzzle Games</a>
+<ul type=disc>
+<li><a href="#prj1_1">Part 1: Solvability (<font color=red>繳交期限 deadline: TBA</font>)</a>
+<li><a href="#prj1_2">Part 2: Successor function (<font color=red>繳交期限 deadline: TBA</font>)</a>
+<li><a href="#prj1_3">Part 3: Manhattan distance (<font color=red>繳交期限 deadline: TBA</font>)</a>
+<li><a href="#prj1_4">Part 4: Priority queue (<font color=red>繳交期限 deadline: TBA</font>)</a>
+<li><a href="#prj1_5">Full system (<font color=red>繳交期限 deadline: TBA</font>)</a>
+</ul>
+</li></p>
+</ul>
+</td></tr>
+</table>
+</p>
+
+<hr>
+
+<h3><a name="prj1">Project 1: 8-Puzzle Games</h3>
+<p>This assignment is broken into five parts.<br>
+Finish them one by one and you will get a full system.</p>
+<ul type=square>
+<li><h4><a name="prj1_1">Part I: Solvability decision</h4>
+<p><b>
+Input: a state<br>
+Output: a Boolean value indicating whether there is a solution for the given state or not
+</b></p>
+<p><b>[Hint] Solvability of N-puzzle problems</b><br>
+<p>Note that the board of an N-puzzle game is an <i>n</i>&times;<i>n</i> square where N = <i>n</i>&times;<i>n</i> &minus; 1.</p>
+<p>If <i>n</i> is odd, and the number of disorder digits (in the state presentation) is even, the problem is solvable.<br>
+Number of disorder digits is measured by counting pairs of digits (i, j) where 1 &le; i &lt; j &le; N but position(i) &gt; position(j). For example,<br>
+<table border=1 cellspacing=0>
+<tr><td width=20 align=middle>3</td><td width=20 align=middle>1</td><td width=20 align=middle>2</td></tr>
+<tr><td align=middle>4</td><td align=middle>5</td><td align=middle>7</td></tr>
+<tr><td align=middle>6</td><td align=middle>&nbsp;</td><td align=middle>8</td></tr>
+</table>
+is unsolvable, because its state representation 31245768 (discarding 0) has 3 disordered pairs: (1,3) (2,3) (6,7).
+</p>
+
+<p>If <i>n</i> is even, and the index of the row containing the empty tile plus the number of disorder digits is even, the problem is solvable. For example,<br>
+<table border=1 cellspacing=0>
+<tr><td width=20 align=middle>1</td><td width=20 align=middle>2</td><td width=20 align=middle>7</td><td width=20 align=middle>4</td></tr>
+<tr><td align=middle>3</td><td align=middle>&nbsp;</td><td align=middle>6</td><td align=middle>10</td></tr>
+<tr><td align=middle>8</td><td align=middle>5</td><td align=middle>13</td><td align=middle>11</td></tr>
+<tr><td align=middle>9</td><td align=middle>12</td><td align=middle>14</td><td align=middle>15</td></tr>
+</table>
+is unsolvable,<br>
+because its state representation 127436A85DB9CEF (discarding 0) has 14 disordered pairs: (3,7) (4,7) (5,7) (6,7) (3,4) (5,6) (5,A) (8,A) (9,A) (5,8) (9,D) (B,D) (C,D) (9,B),<br>
+and the empty tile is at Row #1 (index starts from 0),<br>
+so 14 + 1 = 15 is odd.<br>
+(Note that A ~ F stand for 10 ~ 15.)
+</p>
+<p>
+<p>Testing Input (for 8-puzzle)
+<table border=1 cellpadding=5>
+<tr><td>Input</td><td>Meaning</td></tr>
+<tr><td>
+10<br>
+312457680<br>
+724506831<br>
+438126507<br>
+167352480<br>
+104782563<br>
+817365204<br>
+320685741<br>
+426031785<br>
+102345678<br>
+041235678
+</td>
+<td valign=top>
+Number of test data<br>
+State of test data #1<br>
+State of test data #2<br>
+.<br>
+.<br>
+.
+</td>
+</tr>
+<tr><td>Output</td><td>Meaning</td></tr>
+<tr><td>
+NO<br>
+YES<br>
+NO<br>
+NO<br>
+YES<br>
+YES<br>
+NO<br>
+YES<br>
+YES<br>
+NO
+</td>
+<td valign=top>
+Output of test data #1<br>
+Output of test data #2<br>
+.<br>
+.<br>
+.
+</td>
+</tr>
+</table>
+</p>
+
+<li><h4><a name="prj1_2">Part II: Successor function</h4>
+<p><b>
+Input: a state<br>
+Output: number of all possible actions and the corresponding successor states
+</b><br>
+Note that the actions are always output in the order of {up, down, left, right}.</p>
+<p><table border=1 cellpadding=5>
+<tr><td colspan=2>範例 Examples:</td></tr>
+<tr><td>Input</td><td>Meaning</td></tr>
+<tr><td>
+7<br>
+312457680<br>
+724506831<br>
+438126507<br>
+104782563<br>
+320685741<br>
+426031785<br>
+041235678
+</td>
+<td valign=top>
+Number of test data<br>
+State of test data #1<br>
+State of test data #2<br>
+.<br>
+.<br>
+.
+</td>
+</tr>
+<tr><td>Output</td><td>Meaning</td></tr>
+<tr><td>
+2<br>
+move 0 to up<br>
+312450687<br>
+move 0 to left<br>
+312457608<br>
+4<br>
+move 0 to up<br>
+704526831<br>
+move 0 to down<br>
+724536801<br>
+move 0 to left<br>
+724056831<br>
+move 0 to right<br>
+724560831<br>
+3<br>
+move 0 to up<br>
+438106527<br>
+move 0 to left<br>
+438126057<br>
+move 0 to right<br>
+438126570<br>
+3<br>
+move 0 to down<br>
+184702563<br>
+move 0 to left<br>
+014782563<br>
+move 0 to right<br>
+140782563<br>
+2<br>
+move 0 to down<br>
+325680741<br>
+move 0 to left<br>
+302685741<br>
+3<br>
+move 0 to up<br>
+026431785<br>
+move 0 to down<br>
+426731085<br>
+move 0 to right<br>
+426301785<br>
+2<br>
+move 0 to down<br>
+241035678<br>
+move 0 to right<br>
+401235678<br>
+</td>
+<td valign=top>
+Number of successors of test data #1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The 1st action of test data #1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Next state after the 1st action<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The 2nd action of test data #1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Next state after the 2nd action<br>
+Number of successors of test data #2<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The 1st action of test data #2<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Next state after the 1st action<br>
+.<br>
+.<br>
+.
+</td>
+</tr>
+</table></p>
+<p><b>[Hint]</b><br>
+Possible method:
+<ol>
+<li>Convert a state into a <font face="Courier New"><i>n</i></font>&times;<font face="Courier New"><i>n</i></font> matrix
+<li>Find the coordination of digit 0 as <font face="Courier New">(x<sub>0</sub>, y<sub>0</sub>)</font> 
+<li>Swap 0 with the digits in <font face="Courier New">(x<sub>0</sub>, y<sub>0</sub>-1)</font>, <font face="Courier New">(x<sub>0</sub>, y<sub>0</sub>+1)</font>, <font face="Courier New">(x<sub>0</sub>-1, y<sub>0</sub>)</font>, <font face="Courier New">(x<sub>0</sub>+1, y<sub>0</sub>)</font> if they are legal positions
+</ol>
+</p>
+
+<li><h4><a name="prj1_3">Part III: Manhattan distance, a consistent heuristic for 8-puzzle games</h4>
+<p><b>
+Input: a state<br>
+Output: the Manhattan distance between the given state to the goal state 012345678
+</b></p>
+<p><table border=1 cellpadding=5>
+<tr><td colspan=2>範例 Examples:</td></tr>
+<tr><td>Input</td><td>Meaning</td></tr>
+<tr><td>
+10<br>
+312457680<br>
+724506831<br>
+438126507<br>
+167352480<br>
+104782563<br>
+817365204<br>
+320685741<br>
+426031785<br>
+102345678<br>
+041235678
+</td>
+<td valign=top>
+Number of test data<br>
+State of test data #1<br>
+State of test data #2<br>
+.<br>
+.<br>
+.
+</td>
+</tr>
+<tr><td>Output</td><td>Meaning</td></tr>
+<tr><td>
+6<br>
+18<br>
+17<br>
+12<br>
+15<br>
+15<br>
+10<br>
+13<br>
+1<br>
+6
+</td>
+<td valign=top>
+Manhattan distance of test data #1<br>
+Manhattan distance of test data #2<br>
+.<br>
+.<br>
+.
+</td>
+</tr>
+</table></p>
+
+<li><h4><a name="prj1_4">Part IV: Priority queue</h4>
+<p><b>
+Input: enqueue a state or dequeue from a priority queue<br>
+Output: effects of actions
+</b></p>
+<p>
+<b>Description</b>
+<ul type=disc>
+<li><p>There are two actions, <font color=blue><b>enqueue</b></font> and <font color=blue><b>dequeue</b></font>.</p>
+<li><p>When the action is "enqueue",<br>
+the next input line gives a state and its <i>g</i> and <i>h</i> scores (for <i>cost</i> and <i>heuristic</i>, respectively).</p>
+<li><p>Your priority queue should always put the node with the lowest <i>f</i> (= <i>g</i> + <i>h</i>) score at the top.<br>
+If tied, follow the first-in-first-out policy.</p>
+<li><p>If the action is "enqueue", insert this state into your priority queue and print "Insert OK!" as output.</p>
+<li><p>If the action is "dequeue", get and remove the top state of your priority queue and print that state as output.<br>
+Note that you should check if the queue has been empty.</p>
+</ul>
+</p>
+<p><table border=1 cellpadding=5>
+<tr><td colspan=2>範例一 Example 1:</td></tr>
+<tr><td>Input</td><td>Meaning</td></tr>
+<tr><td valign=top>
+32<br>
+enqueue<br>
+724560831 1 17<br>
+enqueue<br>
+107835264 2 15<br>
+enqueue<br>
+876543210 1 20<br>
+enqueue<br>
+281637405 3 13<br>
+enqueue<br>
+426301785 3 12<br>
+enqueue<br>
+420316785 4 10<br>
+enqueue<br>
+412306785 5 8<br>
+dequeue<br>
+enqueue<br>
+387015264 5 15<br>
+enqueue<br>
+572084361 6 13<br>
+dequeue<br>
+dequeue<br>
+enqueue<br>
+142608753 7 10<br>
+enqueue<br>
+102648753 8 9<br>
+enqueue<br>
+012648753 9 8<br>
+enqueue<br>
+712540638 10 7<br>
+enqueue<br>
+012548673 11 6<br>
+enqueue<br>
+102645738 12 5<br>
+dequeue<br>
+dequeue<br>
+dequeue<br>
+dequeue<br>
+dequeue<br>
+dequeue<br>
+dequeue<br>
+dequeue<br>
+dequeue<br>
+dequeue<br>
+dequeue<br>
+dequeue<br>
+dequeue<br>
+dequeue<br>
+</td>
+<td valign=top>
+Number of test data<br>
+Action of test data #1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The <font color=blue><b>state</b></font>, <font color=blue><b><i>g</i>-score</b></font>, and <font color=blue><b><i>h</i>-score</b></font> of test data #1<br>
+Action of test data #2<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The <font color=blue><b>state</b></font>, <font color=blue><b><i>g</i>-score</b></font>, and <font color=blue><b><i>h</i>-score</b></font> of test data #2<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+(Note that this action is dequeue)<br>
+(Note that this action is enqueue)<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+(dequeue from an empty queue)<br>
+(dequeue from an empty queue)<br>
+</td>
+</tr>
+<tr><td>Output</td><td>Meaning</td></tr>
+<tr><td valign=top>
+Insert OK!<br>
+Insert OK!<br>
+Insert OK!<br>
+Insert OK!<br>
+Insert OK!<br>
+Insert OK!<br>
+Insert OK!<br>
+Got 412306785<br>
+Insert OK!<br>
+Insert OK!<br>
+Got 420316785<br>
+Got 426301785<br>
+Insert OK!<br>
+Insert OK!<br>
+Insert OK!<br>
+Insert OK!<br>
+Insert OK!<br>
+Insert OK!<br>
+Got 281637405<br>
+Got 107835264<br>
+Got 142608753<br>
+Got 102648753<br>
+Got 012648753<br>
+Got 712540638<br>
+Got 012548673<br>
+Got 102645738<br>
+Got 724560831<br>
+Got 572084361<br>
+Got 387015264<br>
+Got 876543210<br>
+Queue is empty!!<br>
+Queue is empty!!<br>
+</td>
+<td valign=top>
+Output of an enqueue action (test data #1)<br>
+Output of an enqueue action (test data #2)<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+Output of a dequeue action<br>
+.<br>
+.<br>
+Output of a dequeue action<br>
+Output of a dequeue action<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+.<br>
+Output of a dequeue action when the queue is empty<br>
+Output of a dequeue action when the queue is empty<br>
+</td>
+</tr>
+<tr><td colspan=2>範例二 Example 2:</td></tr>
+<tr><td>Input</td><td>Meaning</td></tr>
+<tr><td valign=top>
+27<br>
+enqueue<br>
+026431785 1 12<br>
+enqueue<br>
+426731085 1 14<br>
+enqueue<br>
+426301785 1 12<br>
+dequeue<br>
+enqueue<br>
+426031785 2 13<br>
+enqueue<br>
+206431785 2 13<br>
+dequeue<br>
+enqueue<br>
+406321785 2 13<br>
+enqueue<br>
+426381705 2 13<br>
+enqueue<br>
+426031785 2 13<br>
+enqueue<br>
+426310785 2 11<br>
+dequeue<br>
+enqueue<br>
+420316785 3 10<br>
+enqueue<br>
+426315780 3 10<br>
+enqueue<br>
+426301785 3 12<br>
+dequeue<br>
+enqueue<br>
+426310785 4 11<br>
+enqueue<br>
+402316785 4 9<br>
+dequeue<br>
+enqueue<br>
+426310785 4 11<br>
+enqueue<br>
+426315708 4 9<br>
+dequeue<br>
+enqueue<br>
+412306785 5 8<br>
+enqueue<br>
+042316785 5 8<br>
+enqueue<br>
+420316785 5 10<br>
+dequeue<br>
+enqueue<br>
+426305718 5 10<br>
+</td>
+<td valign=top>
+Number of test data<br>
+Action of test data #1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The <font color=blue><b>state</b></font>, <font color=blue><b><i>g</i>-score</b></font>, and <font color=blue><b><i>h</i>-score</b></font> of test data #1<br>
+Action of test data #2<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The <font color=blue><b>state</b></font>, <font color=blue><b><i>g</i>-score</b></font>, and <font color=blue><b><i>h</i>-score</b></font> of test data #2<br>
+.<br>
+.<br>
+(Note that this action is dequeue)<br>
+.<br>
+.<br>
+.<br>
+.<br>
+(Note that this action is enqueue)<br>
+.<br>
+.<br>
+.<br>
+.<br>
+</td>
+</tr>
+<tr><td>Output</td><td>Meaning</td></tr>
+<tr><td valign=top>
+Insert OK!<br>
+Insert OK!<br>
+Insert OK!<br>
+Got 026431785<br>
+Insert OK!<br>
+Insert OK!<br>
+Got 426301785<br>
+Insert OK!<br>
+Insert OK!<br>
+Insert OK!<br>
+Insert OK!<br>
+Got 426310785<br>
+Insert OK!<br>
+Insert OK!<br>
+Insert OK!<br>
+Got 420316785<br>
+Insert OK!<br>
+Insert OK!<br>
+Got 426315780<br>
+Insert OK!<br>
+Insert OK!<br>
+Got 402316785<br>
+Insert OK!<br>
+Insert OK!<br>
+Insert OK!<br>
+Got 426315708<br>
+Insert OK!<br>
+</td>
+<td valign=top>
+Output of an enqueue action (test data #1)<br>
+Output of an enqueue action (test data #2)<br>
+.<br>
+Output of a dequeue action<br>
+.<br>
+.<br>
+Output of a dequeue action<br>
+.<br>
+.<br>
+.<br>
+.<br>
+</td>
+</tr>
+</table></p>
+
+<li><h4><a name="prj1_5">Full system: an 8-puzzle game</h4>
+<p><b>
+Input: a state<br>
+Output: the best solution (the shortest sequence of actions) to the goal state 012345678
+</b></p>
+<p><table border=1 cellpadding=5>
+<tr><th colspan=2>範例一 Example 1:</th></tr>
+<tr><td>Input</td><td>Output</td></tr>
+<tr><td>
+312457680
+</td><td>
+No solution!!
+</td></tr>
+<tr><th colspan=2>範例二 Example 2:</th></tr>
+<tr><td>Input</td><td>Output</td></tr>
+<tr><td>
+012345678
+</td><td>
+It is the goal state.
+</td></tr>
+<tr><th colspan=2>範例三 Example 3:</th></tr>
+<tr><td>Input</td><td>Output</td></tr>
+<tr><td valign=top>
+351042678
+</td><td>
+move 0 to right<br>
+move 0 to up<br>
+move 0 to right<br>
+move 0 to down<br>
+move 0 to left<br>
+move 0 to left<br>
+move 0 to up
+</td></tr>
+</table></p>
+<p>For your information, the lengths of the solutions to the solvable initial states in Problem 1-1 are:
+<ul type=disc>
+<li>724506831: 26 steps
+<li>104782563: 17 steps
+<li>817365204: 25 steps
+<li>426031785: 17 steps
+<li>102345678: 1 step
+</ul>
+If you find a longer solution, fix the bugs.<br>
+If you find a shorter solution, please let me know.
+</p>
+<li>Possible Algorithm
+<table border=1>
+<tr><td>
+<font face="Courier New">#define Ndim 3</font><br>
+<br>
+<font face="Courier New">struct dataNode {</font><br>
+<font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;data state;</font> <font color="green">// choose whatever representation of a state you like, such as a string or a Ndim &times; Ndim array)</font><br>
+<font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;int g, h, f;</font> <font color="green">// g: so-far cost; h: estimated cost to goal; f = g + h</font><br>
+<font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;int action; dataNode *parent;</font><br>
+<font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="green">// this state is generated by applying which action to which parent state</font><br>
+<font face="Courier New">};</font><br><br>
+<font face="Courier New">priorityQueue pqueue;</font><br>
+<font face="Courier New">bool unsolvable(data state) {...}</font> <font color="green">// check if the given state is solvable</font><br>
+<font face="Courier New">int heuristic(data state) {...}</font> <font color="green">// return the Manhattan distance of a given state</font><br>
+<font face="Courier New">list findSuccessor(data state) {...}</font> <font color="green">// return the valid next steps</font><br><br>
+<font face="Courier New">main() {</font>
+<ul type=disc>
+<li><font face="Courier New">dataNode mynode, newnode, final</font>
+<li><font face="Courier New">int nextStateCount</font>
+<li><font face="Courier New">data goal</font> ← representation of the goal state, i.e. 012345678 for 8-puzzle
+<li><font face="Courier New">data nextState[4]</font>
+<li><font face="Courier New">char nextAction[4]</font> <font color="green">// for 0 to 4 directions, up, down, left, and right</font>
+</ul><br>
+<ol>
+<li><font face="Courier New">final</font> ← <font face="Courier New">NULL</font>
+<li>Ask the user to input the initial state of a N-puzzle game
+<li>Save the initial state in <font face="Courier New">mynode.state</font>
+<li><font face="Courier New">If unsolvable(mynode.state)</font>, output "No solution!!" and exit the program.
+<li><font face="Courier New">If mynode.state = goal</font>, output "It is the goal state." and exit the program.
+<li><font face="Courier New">mynode.g</font> ← <font face="Courier New">0</font>
+<li><font face="Courier New">mynode.h</font> ← <font face="Courier New">heuristic(mynode.state)</font>
+<li><font face="Courier New">mynode.f</font> ← <font face="Courier New">mynode.g</font> + <font face="Courier New">mynode.h</font>
+<li><font face="Courier New">mynode.parent</font> ← <font face="Courier New">NULL</font>
+<li><font face="Courier New">pqueue.enqueue(mynode)</font>
+<li>
+<li>Loop when <font face="Courier New">pqueue</font> is still not empty
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;mynode</font> ← <font face="Courier New">pqueue.dequeue()</font>
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;</font>If <font face="Courier New">mynode.state</font> = <font face="Courier New">goal</font>
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;final</font> ← <font face="Courier New">mynode</font>
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font>Jump out of the loop
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;{(nextState, nextAction)}</font> ← <font face="Courier New">findSuccessor(mynode.state)</font>
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;</font>For <font face="Courier New">(nextState, nextAction)</font> in <font face="Courier New">{(nextState, nextAction)}</font>
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;newnode</font> ← new <font face="Courier New">dataNode</font>
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;newnode.state</font> ← <font face="Courier New">nextState</font>
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;newnode.action</font> ← <font face="Courier New">nextAction</font>
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;newnode.g</font> ← <font face="Courier New">mynode.g + </font> 1
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;newnode.h</font> ← <font face="Courier New">heuristic(nextState)</font>
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;newnode.f</font> ← <font face="Courier New">newnode.g</font> + <font face="Courier New">newnode.h</font>
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;newnode.parent</font> ← <font face="Courier New">mynode</font>
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pqueue.enqueue(newnode)</font>
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;</font>End of For
+<li>End of loop
+<li>
+<li>If <font face="Courier New">final</font> is <font face="Courier New">NULL</font>
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;</font>Output "No solution!!"
+<li>Else
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;</font>Reverse the linked list from <font face="Courier New">final</font> to the root (who has no parent)
+<li><font face="Courier New">&nbsp;&nbsp;&nbsp;&nbsp;</font>Traverse the linked list and print out the actions
+</ol>
+<font face="Courier New">}</font>
+</td></tr>
+</table></p>
+
+</ul>
+<div style="display: none;">
+<hr>
+<h3>作業程式上傳</h3>
+<p>作業程式上傳系統為 (Submit your programs here)：
+<blockquote><a href="http://nlp9.cse.ntou.edu.tw" target="blank">DOMjudge (NTOU NLP Lab)</a></blockquote>
+若無帳號，請先註冊，「team name」請填學號加姓名，以免無法評分。<br>
+When registering, please use your student ID + your name as the team name so that we can know who submits the codes.
+<blockquote><img src="DOMjd_login1.png" /></blockquote>
+<blockquote><img src="DOMjd_login2.png" /></blockquote>
+<blockquote><img src="DOMjd_login3.png" /></blockquote>
+</p>
+<p>作業程式上傳步驟：
+<ol>
+<li><p>選擇 contest；按下 submit 鍵<br>
+<img src="DOMjd_submit1.png" /></p>
+<li><p>瀏覽並選擇你的程式檔；選擇要交的題目；選所用的程式語言；按下 submit 鍵<br>
+<img src="DOMjd_submit2.png" /></p>
+</ol>
+</p>
+<p>評分規則 Scoring rules<br>(只看你最成功的那次，其他上傳不論。)<br>(Only the most successful codes are scored. Others will be ignored.)
+<ul type=disc>
+<li>正確 Correct: 100
+<li>隱藏測資錯誤 Incorrect Answer for Hidden Test Data: 20
+<li>其餘情形 0 分 (Otherwise 0 point)
+</ul></p>
+<p>
+
+</p>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+</div>
+
+</body></html>
