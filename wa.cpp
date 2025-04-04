@@ -69,97 +69,82 @@ inline void flush() { fwrite(obuf, p3 - obuf, 1, stdout); }
 }
 using IO::read;
 using IO::write;
-#define max(a,b) (a>b)?a:b
-bool check(vector<int> &arr , int n , auto & gap) {
-    auto next = (gap.empty())?gap.end():gap.begin();
-    for(int i = 0 ; i < n ; i++) {
-        if(next != gap.end() && i == next->first) {
-            i = next->second;
-            next++;
-        }
-        else if(arr[i] == 0) {
-            return 1;
-        }
-    }
-    return 0;
+vector<int> sz;
+vector<int> fa;
+
+int cnt;
+bitset<100001> vis;
+vector<int> V;
+
+bitset<100001> tag;
+
+int findd(int n) {
+    // de(fa[n]);
+    return (n == fa[n])?n:fa[n] = findd(fa[n]);
 }
+void dfs(int now, int f) {
+    if(vis[now]) {
+        fa[now] = f;
+        sz[now] = cnt;
+        return ;
+    }
+    vis[now] = 1;
+    cnt++;;
+    dfs(V[now] , now);
+    // de(cnt);
+    sz[now] = cnt;
+    fa[now] = f;
+    return ;
+}
+
 void solve() {
     int n;
     read(n);
-    vector<int> arr(n);
-    bool allZ = 1;
-    for(auto &a : arr) {
-        read(a);
-        if(a!=0)allZ = 0;
+    // de(n);
+    vector<int> q(n+1);
+    tag.reset();
+    fa.resize(n+1);
+    iota(all(fa) , 0);
+    V.clear();
+    V.resize(n + 1);
+    vis.reset();
+    sz.assign(n+1 ,1);
+    for(int i = 1 ; i <= n ; i++) {
+        read(V[i]);
     }
-    if(allZ) {
-        int mid = n/2;
-        cout << 3 << endl;
-        cout << 1 << ' ' << mid << endl;
-        n -= mid;
-        cout << 2 << ' ' << n+1 << endl;
-        cout << 1 << ' ' << 2 << endl;
-        return ;
-    }
-    int tmp=0;
-    vector<pair<int,int>> gap;
-    vector<pair<int,int>> ans;
-    int i = 0;
-    orange(all(arr));
-    while(check(arr , n , gap)) {
-        int step1 = 1;
-        if(i >= n) i = 0;
-        auto next = (gap.empty())?gap.end():gap.begin();
-        while(i < n && arr[i] != 0) {
-            if(next != gap.end() && i == next->first) {
-                i = next->second;
-                next++;
-            } else {
-                i++;
-                step1++;
-            }
+    for(int i = 1; i <= n ; i++) {
+        if(vis[V[i]] == 0) {
+            cnt = 0;
+            dfs(V[i] , V[i]);
         }
-        int l = i-1;
-        int step = 0;
-        while(i < n && arr[i] == 0) {
-            if(next != gap.end() && i == next->first) {
-                i = next->second;
-                next++;
-            } else {
-                step++;
-                arr[i] = 1;
-                i++;
-            }
-        }
-        
-        if(step1 == step1+step) step1--, step = 1 , i--;
-        
-        de(step1, step1+step , l , i);
-        tmp += step;
-        ans.push_back({step1 , step1+step});
-        gap.push_back({l , i-1});
     }
-    // de(tmp);
-    orange(all(arr));
-    n -= tmp;
-    ans.push_back({1 , n});
-    cout << ans.size() << endl;
-    for(auto & a : ans) {
-        cout << a.first << ' ' << a.second << endl;
-    }
-    
-    return ;
+    int now = 0;
+    for(int i = 1 ; i <= n ; i++) {
+        read(q[i]);
 
+        auto tmp = findd(q[i]);
+        // de(tmp);
+        if(tag[tmp] == 0) {
+            tag[tmp] = 1;
+            now += sz[tmp];
+        }
+        // de(now);
+        write(now ,' ');
+
+    }
+    write('\n');
+    // orange(all(sz));
+    return ;
 }
 
 signed main(){
-    int t;
+    int t = 1;
     read(t);
     while(t--) {
         solve();
     }
 
-
+    IO::flush();
     return 0;
 
 }

@@ -1,5 +1,5 @@
 {
-  "workbench.colorTheme": "Monokai Pro (Filter Machine)",
+  "workbench.colorTheme": "Theme",
   "clang-format.executable": "C:\\Program Files\\LLVM\\bin\\clang-format.exe",
   "editor.mouseWheelZoom": true,
   "[cpp]": {

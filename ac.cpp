@@ -1,130 +1,127 @@
-#include <bits/stdc++.h>
-#define piyan puts("操我屁眼");
-#define fk puts("幹你娘幹你娘");
-#define int i64
-#define FF first
-#define SS second
-#define SZ(x) ((i32)(x).size())
-#define PB push_back
-#define EB emplace_back
-#define all(x) (x).begin(), (x).end()
-using i128 = __int128_t;
-using ui64 = uint64_t;
-using i64 = int64_t;
-using ui32 = uint32_t;
-using i32 = int32_t;
-using ld = long double;
-// using P32 = pair<i32, i32>;
-// using P64 = pair<i64, i64>;
-const i64 INF = 1e18;
-const ld eps = 1e-8L;
-
+#include<iostream>
+#include<cmath>
+#include<cstdio>
+#include<iomanip>
+#include<cstring>
+#include<stdlib.h>
+#include<string>
+#include<algorithm>
+#include<queue>
 using namespace std;
-#ifdef LOCAL
-void debug() {}
-template<class T> void debug(T var) { cerr << var; }
-template<class T, class ...P> void debug(T var, P ...t) { cerr << var << ", "; debug(t...); }
-template<class T> void org(T l, T r) { while(l != r) cerr << *l++ << ' '; }
-#define de(...) { cerr << "[Line: " << __LINE__ << "][" << #__VA_ARGS__ << "] -> [", debug(__VA_ARGS__), cerr << "]\n"; }
-#define orange(...) { cerr << "[Line: " << __LINE__ << "][" << #__VA_ARGS__ << "] -> [", org(__VA_ARGS__), cerr << "]\n"; }
-#else
-#define de(...) ((void)0)
-#define orange(...) ((void)0)
-#endif
-
-int mex(vector<int> &v , int l , int r) {
-    
-    for(; l <= r ; l++) {
-        if(v[l] == 0) return 1;
-    }
-    return 0;
+#define lson l,m,rt<<1
+#define rson m+1,r,rt<<1|1
+const int  maxn =50001;
+int  sum[maxn<<2];//sum为在范围内的花数
+int ql,qr,ans;
+int n,m;
+int  lazy[maxn<<2];//lazy为判断是否全为空或全为满则为1，否则为0
+void pushup(int rt,int m)//将当前结点的信息更新的父节点
+{
+	sum[rt]=sum[rt<<1]+sum[rt<<1|1];
+	if(sum[rt]==m||!sum[rt])
+		lazy[rt]=1;
+	else
+		lazy[rt]=0;
 }
-void solve() {
-    int n;
-    cin >> n;
-    vector<int> V(n);
-    for(auto &a : V) {
-        cin >> a;
-    }
-    vector<pair<int,int>> ans;
-    while(V.size() > 1) {
-        bool NoZero = 1;
-        int l = -1,  r = -1;
-        // orange(all(V));
-        for(int i = V.size() - 1 ; i >= 0 && r==-1; i--) {
-            if(V[i] == 0) {
-                NoZero = 0;
-                r = i;
-                while(i >= 0 && V[i] == 0) {
-                    l=i;
-                    i--;
-                }
-            }
-        }
-        if(l == r) {
-            if(r + 1 < V.size()) {
-                r++;
-            } else {
-                l--;
-            }
-        }
-        // de(NoZero , l , r);
-        if(NoZero) {
-            ans.push_back({1, V.size()});
-            break;
-        } else if(r == V.size() -1 && l == 0) {
-            int n = V.size();
-            int m = n / 2;
-            ans.push_back({1, m}); n -= m;
-            ans.push_back({1 , n});
-            ans.push_back({1, 2});
-            break;
-        } else {
-            if(r == -1) {
-                ans.push_back({1, 2});
-                vector<int> tmp = { mex(V , 0 , 1) };
-                tmp.reserve(V.size());
-                for(int i = 2 ; i < V.size() ; i++) {
-                    tmp.push_back(V[i]);
-                }
-                V = tmp;
-            }
-            else {
-                {
-                    int nl = min(l ,r);
-                    int nr = max(l ,r);
-                    l = nl;
-                    r = nr;
-                }
-                int me = mex(V , l , r);
-
-                // de(l , r);
-                ans.push_back({l+1 , r+1});
-                vector<int> tmp; tmp.reserve(V.size());
-                for(int i = 0 ; i < l ; i++) {
-                    tmp.push_back(V[i]);
-                }
-                tmp.push_back(me);//de(me);
-                for(int i = r + 1 ; i < V.size() ; i++) {
-                    tmp.push_back(V[i]);
-                }
-                V = tmp;
-            }
-        }
-    }
-    cout << ans.size() << endl;
-    for(auto &a : ans) {
-        cout << a.first << ' ' << a.second << endl;
-    }
+void pushdown(int rt,int  m)//延迟标记向下推 m为长度
+{
+	if(sum[rt]==m)//全为满
+	{
+		sum[rt<<1]=m-(m>>1);
+		sum[rt<<1|1]=(m>>1);
+	}
+	else
+		sum[rt<<1]=sum[rt<<1|1]=0;
+	lazy[rt<<1]=lazy[rt<<1|1]=1;
 }
-signed main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-    int t; cin >> t;
-    while(t--) {
-        solve();
-    }
-
-
-    return 0;
+void build(int l,int r,int rt)//建立线段树
+{
+	lazy[rt]=1;
+	sum[rt]=0;
+	if(l==r)
+	{
+		return ;
+	}
+	int  m=(l+r)>>1;
+	build(lson);
+	build(rson);
+}
+int R;
+void query(int L,int c,int l,int r,int rt)
+{
+	if(c<=0)return ;
+	if(L<=l&&r<=R&&lazy[rt])//在范围内  且全为空或者全为满
+	{
+		if(!sum[rt])//全为空
+		{
+			ans-=(r-l+1);
+			sum[rt]=(r-l+1);
+			if(ql<0)ql=l;
+			qr=r;
+		}
+		else//如果全为满 不能插花 想要跳过 因此右的边界范围扩大
+		{
+			R+=(r-l+1);
+			if(R>n)
+				R=n;
+		}
+		return ;
+	}
+	if(lazy[rt])
+	pushdown(rt,r-l+1);
+	lazy[rt]=0;
+	int  m=(l+r)>>1;
+	if(L<=m)query(L,c,lson);
+	if(R>m)query(L,c,rson);
+	pushup(rt,r-l+1);
+}
+void update(int L,int R,int l,int r,int rt)
+{
+	if(L<=l&&r<=R)
+	{
+		ans+=sum[rt];
+		lazy[rt]=1;
+		sum[rt]=0;
+		return ;
+	}
+	if(lazy[rt])
+	pushdown(rt,r-l+1);
+	lazy[rt]=0;
+	int  m=(l+r)>>1;
+	if(L<=m)update(L,R,lson);
+	if(R>m) update(L,R,rson);
+	pushup(rt,r-l+1);
+}
+int main()
+{
+	int t;
+	scanf("%d",&t);
+	while(t--)
+	{
+		scanf("%d%d",&n,&m);
+		build(1,n,1);
+		int a,b,c;
+		while(m--)
+		{
+			scanf("%d%d%d",&a,&b,&c);
+			if(a==1)
+			{
+				b++;
+				ql=qr=-1;//左右两个花瓶
+				R=b+c-1;
+				query(b,c,1,n,1);
+				if(qr>0)printf("%d %d\n",ql-1,qr-1);
+				else  printf("Can not put any one.\n");
+			}
+			else
+			{
+				b++,c++;
+				ans=0;
+				update(b,c,1,n,1);
+				printf("%d\n",ans);
+			}
+		}
+		printf("\n");
+	}
+	return 0;
 }
