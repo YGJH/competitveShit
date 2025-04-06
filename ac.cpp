@@ -1,127 +1,118 @@
 #include<iostream>
-#include<cmath>
-#include<cstdio>
-#include<iomanip>
 #include<cstring>
-#include<stdlib.h>
-#include<string>
-#include<algorithm>
+#include<set>
+#include<map>
+#include<functional>
+#include<vector>
 #include<queue>
+#include<math.h>
+#include<algorithm>
 using namespace std;
-#define lson l,m,rt<<1
-#define rson m+1,r,rt<<1|1
-const int  maxn =50001;
-int  sum[maxn<<2];//sum为在范围内的花数
-int ql,qr,ans;
+typedef long long ll;
+typedef pair<int,int> pii;
+#define lson u<<1
+#define rson u<<1|1
+#define IOS ios::sync_with_stdio(0);cin.tie(nullptr)
+const int N=5e4+10; 
+struct node{
+    int l,r;
+    int sum;
+    int tag;    
+}tr[N<<2];
+void pushup(int u){
+    tr[u].sum=tr[lson].sum+tr[rson].sum;
+}
+void build(int l,int r,int u=1){
+    tr[u].l=l,tr[u].r=r;
+    tr[u].sum=0;tr[u].tag=-1;
+    if(l==r) return;
+    int mid=l+r>>1;
+    build(l,mid,lson);
+    build(mid+1,r,rson);
+}
+void pushdown(int u){
+    if(tr[u].tag==-1) return;
+    tr[lson].sum=(tr[lson].r-tr[lson].l+1)*tr[u].tag;
+    tr[rson].sum=(tr[rson].r-tr[rson].l+1)*tr[u].tag;
+    tr[lson].tag=tr[rson].tag=tr[u].tag;
+    tr[u].tag=-1;
+}
+void update(int l,int r,int x,int u=1){
+    if(tr[u].l>=l && tr[u].r<=r){
+        tr[u].tag=x;
+        tr[u].sum=(tr[u].r-tr[u].l+1)*x;
+        return;
+    }
+    pushdown(u);
+    int mid=tr[u].l+tr[u].r>>1;
+    if(mid>=l) update(l,r,x,lson);
+    if(mid+1<=r) update(l,r,x,rson);
+    pushup(u);
+}
+int query(int l,int r,int u=1){
+    if(tr[u].l>=l && tr[u].r<=r){
+        return tr[u].sum;
+    }
+    pushdown(u);
+    int mid=tr[u].l+tr[u].r>>1;
+    int res=0;
+    if(mid>=l) res+=query(l,r,lson);
+    if(mid+1<=r) res+=query(l,r,rson);
+    return res;
+}
+int findlast(int l,int r,int y){
+    if(l==r) return r;
+    int mid=l+r>>1;
+    int tsum=query(l,mid);
+    if(mid-l+1-tsum>=y){
+        return findlast(l,mid,y);
+    }
+    else{
+        return findlast(mid+1,r,y-(mid-l+1-tsum));  
+    }
+}
 int n,m;
-int  lazy[maxn<<2];//lazy为判断是否全为空或全为满则为1，否则为0
-void pushup(int rt,int m)//将当前结点的信息更新的父节点
-{
-	sum[rt]=sum[rt<<1]+sum[rt<<1|1];
-	if(sum[rt]==m||!sum[rt])
-		lazy[rt]=1;
-	else
-		lazy[rt]=0;
+void solve(){
+    cin>>n>>m;
+    build(1,n);
+    while(m--){
+        int opt,x,y;
+        cin>>opt>>x>>y;
+        if(opt==1){
+            x++;
+            int p=-1;
+            int sum=query(x,n);
+            if(sum==n-x+1){
+                cout<<"Can not put any one."<<'\n';
+            }
+            else if(sum>=n-x+1-y){
+                int s=findlast(x,n,1);
+                int e=findlast(x,n,n-x+1-sum);
+                update(s,e,1);
+                s--;e--;
+                cout<<s<<" "<<e<<'\n';
+            }
+            else{
+                int s,e;
+                s=findlast(x,n,1);
+                e=findlast(s,n,y);
+                update(s,e,1);
+                s--;e--;
+                cout<<s<<' '<<e<<'\n';
+            }
+        }
+        else{
+            x++;y++;
+            cout<<query(x,y)<<'\n';
+            update(x,y,0);
+        }
+    }
+    cout<<'\n';
 }
-void pushdown(int rt,int  m)//延迟标记向下推 m为长度
-{
-	if(sum[rt]==m)//全为满
-	{
-		sum[rt<<1]=m-(m>>1);
-		sum[rt<<1|1]=(m>>1);
-	}
-	else
-		sum[rt<<1]=sum[rt<<1|1]=0;
-	lazy[rt<<1]=lazy[rt<<1|1]=1;
-}
-void build(int l,int r,int rt)//建立线段树
-{
-	lazy[rt]=1;
-	sum[rt]=0;
-	if(l==r)
-	{
-		return ;
-	}
-	int  m=(l+r)>>1;
-	build(lson);
-	build(rson);
-}
-int R;
-void query(int L,int c,int l,int r,int rt)
-{
-	if(c<=0)return ;
-	if(L<=l&&r<=R&&lazy[rt])//在范围内  且全为空或者全为满
-	{
-		if(!sum[rt])//全为空
-		{
-			ans-=(r-l+1);
-			sum[rt]=(r-l+1);
-			if(ql<0)ql=l;
-			qr=r;
-		}
-		else//如果全为满 不能插花 想要跳过 因此右的边界范围扩大
-		{
-			R+=(r-l+1);
-			if(R>n)
-				R=n;
-		}
-		return ;
-	}
-	if(lazy[rt])
-	pushdown(rt,r-l+1);
-	lazy[rt]=0;
-	int  m=(l+r)>>1;
-	if(L<=m)query(L,c,lson);
-	if(R>m)query(L,c,rson);
-	pushup(rt,r-l+1);
-}
-void update(int L,int R,int l,int r,int rt)
-{
-	if(L<=l&&r<=R)
-	{
-		ans+=sum[rt];
-		lazy[rt]=1;
-		sum[rt]=0;
-		return ;
-	}
-	if(lazy[rt])
-	pushdown(rt,r-l+1);
-	lazy[rt]=0;
-	int  m=(l+r)>>1;
-	if(L<=m)update(L,R,lson);
-	if(R>m) update(L,R,rson);
-	pushup(rt,r-l+1);
-}
-int main()
-{
-	int t;
-	scanf("%d",&t);
-	while(t--)
-	{
-		scanf("%d%d",&n,&m);
-		build(1,n,1);
-		int a,b,c;
-		while(m--)
-		{
-			scanf("%d%d%d",&a,&b,&c);
-			if(a==1)
-			{
-				b++;
-				ql=qr=-1;//左右两个花瓶
-				R=b+c-1;
-				query(b,c,1,n,1);
-				if(qr>0)printf("%d %d\n",ql-1,qr-1);
-				else  printf("Can not put any one.\n");
-			}
-			else
-			{
-				b++,c++;
-				ans=0;
-				update(b,c,1,n,1);
-				printf("%d\n",ans);
-			}
-		}
-		printf("\n");
-	}
-	return 0;
+
+int main(){
+    IOS;
+    int t;
+    cin>>t;
+    while(t--)solve();
 }

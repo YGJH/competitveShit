@@ -13,27 +13,7 @@ template<class T> void org(T l, T r) { while(l != r) cerr << *l++ << ' '; }
 #define orange(...) ((void)0)
 #endif
 int main() {
-    int T;
-    cin >> T;
-    while (T--) {
-        long long n;
-        cin >> n;
-        de(n);
-        long long lo = 0, hi = n - 1;
-        while (lo < hi) {
-            long long mid = (lo + hi + 1) / 2;
-            cout << "READ " << mid << endl;
-            fflush(stdout);
-            string res;
-            cin >> res;
-            if (res == "true") {
-                lo = mid;
-            } else { 
-                hi = mid - 1;
-            }
-        }
-        cout << "OUTPUT " << lo << endl;
-        fflush(stdout);
-    }
-    return 0;
+    int tmp ;
+    cin >> tmp;
+    cout << __lg(tmp) ;
 }
