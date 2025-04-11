@@ -19,8 +19,9 @@ if [ -z "$3" ]; then
     rm a.out
     echo "編譯源碼檔案: $1"
     g++ $1 -O3 -w -Wfatal-errors -Wall -Wshadow -fsanitize=undefined -DLOCAL
-    execTime = $(time ./a.out < ${in})
-    echo "${execTime}"
+    # execTime = $( {time ./a.out < ${in} } )
+    # echo "${execTime}"
+    ./a.out < "${in}"
 else
     out="$3"
     rm a.out
