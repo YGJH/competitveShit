@@ -20,7 +20,7 @@ while true; do
     echo "執行測試 #$count"
     
     # 生成測試資料
-    python3 gen.py > in || { echo "生成測試資料失敗"; exit 1; }
+    ./gen.py || { echo "生成測試資料失敗"; exit 1; }
     
     # 執行兩個程式
     timeout 1s ./ac < in > ac.out

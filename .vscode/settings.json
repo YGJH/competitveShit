@@ -11,6 +11,8 @@
   "window.menuBarVisibility": "compact",
   "editor.renderWhitespace": "all",
   "workbench.sideBar.location": "left",
+  "clang-format.executable": "C:\\Program Files\\LLVM\\bin\\clang-format.exe",
+
   "vim.commandLineModeKeyBindingsNonRecursive": [
       {
           "vim.easymotion": true,
@@ -154,7 +156,17 @@
     "thread": "cpp",
     "typeindex": "cpp",
     "typeinfo": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "xhash": "cpp",
+    "xlocinfo": "cpp",
+    "locale": "cpp",
+    "xfacet": "cpp",
+    "xlocale": "cpp",
+    "xlocbuf": "cpp",
+    "xlocmes": "cpp",
+    "xlocnum": "cpp",
+    "xloctime": "cpp",
+    "xtr1common": "cpp"
   },
   "cmake.configureOnOpen": false
 }
