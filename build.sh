@@ -23,7 +23,7 @@ if [ -z "$3" ]; then
     ./a.out < "${in}"
 
     # 使用外部 time 命令測量時間
-    times=$(/usr/bin/time -f "%U %S %e" ./a.out < "${in}")
+    times=$(/usr/bin/time -f "%U %S %e" ./a.out < "${in} > /dev/null" 2>&1)
     # read user sys real <<< "$times"
     # echo "執行結果："
     # echo "  使用者時間: ${user}s"

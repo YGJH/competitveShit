@@ -12,7 +12,8 @@ const int BOARD_SIZE = 6;
 const char EMPTY = '+';
 const char PLAYER_X = 'X'; // AI 1 (ac.cpp)
 const char PLAYER_O = 'O'; // AI 2 (wa.cpp)
-const int AI_DEPTH = 5;   // AI 搜索深度 (你可以調整)
+const int AI1_DEPTH = 7;   // ac 搜索深度 (你可以調整)
+const int AI2_DEPTH = 9;   // wa 搜索深度 (你可以調整)
 
 // --- 類型定義 ---
 using OthelloBoard = std::vector<std::vector<char>>;
@@ -27,7 +28,6 @@ int charToCoord(char c) {
 // --- 輔助函式：整數座標轉字元 (用於顯示) ---
 char coordToCharRow(int r) { return 'A' + r; }
 char coordToCharCol(int c) { return 'a' + c; }
-
 // --- 函式宣告 ---
 void initializeBoard(OthelloBoard& board);
 void printBoard(const OthelloBoard& board);
@@ -36,7 +36,7 @@ std::pair<int, int> parseAIMove(const std::string& moveStr);
 bool isMoveValidOnBoard(const OthelloBoard& board, int r, int c, char player);
 std::vector<std::pair<int, int>> getValidMoves(const OthelloBoard& board, char player);
 void applyMove(OthelloBoard& board, int r, int c, char player);
-std::string runAI(const std::string& ai_executable, const OthelloBoard& currentBoard, char player_char, int depth);
+std::string runAI(const std::string& ai_executable, const OthelloBoard& currentBoard, char player_char, int AI1_DEPTH , int AI2_DEPTH);
 void countScores(const OthelloBoard& board, int& scoreX, int& scoreO);
 
 // --- 主遊戲邏輯 ---
@@ -45,7 +45,7 @@ int main() {
     initializeBoard(board);
 
     // char currentPlayer = PLAYER_X; // X (ac.cpp) 先手
-    char currentPlayer = PLAYER_X; // X (ac.cpp) 先手
+    char currentPlayer = PLAYER_X; // O (wa.cpp) 先手
     std::string ai1_executable = "ac"; // 在 Windows 上
     std::string ai2_executable = "wa"; // 在 Windows 上
     // 在 Linux/macOS 上可能是 "./ac" 和 "./wa"
@@ -56,7 +56,7 @@ int main() {
 
     std::cout << "Othello Game Runner Started!" << std::endl;
     std::cout << "Player X (AI1 - " << ai1_executable << ") vs Player O (AI2 - " << ai2_executable << ")" << std::endl;
-    std::cout << "AI Search Depth: " << AI_DEPTH << std::endl;
+    std::cout << "AI Search Depth: " << AI1_DEPTH << ' ' << AI2_DEPTH << std::endl;
 
 
     while (turn_count < MAX_TURNS) {
@@ -80,7 +80,7 @@ int main() {
         }
 
         std::string current_ai_exe = (currentPlayer == PLAYER_X) ? ai1_executable : ai2_executable;
-        std::string ai_move_str = runAI(current_ai_exe, board, currentPlayer, AI_DEPTH);
+        std::string ai_move_str = runAI(current_ai_exe, board, currentPlayer, AI1_DEPTH , AI2_DEPTH);
 
         if (ai_move_str == "pass" || ai_move_str.empty()) {
             std::cout << "AI for player " << currentPlayer << " (" << current_ai_exe << ") chose to pass or failed to provide a move." << std::endl;
@@ -282,7 +282,7 @@ void applyMove(OthelloBoard& board, int r, int c, char player) {
     }
 }
 
-std::string runAI(const std::string& ai_executable, const OthelloBoard& currentBoard, char player_char, int depth) {
+std::string runAI(const std::string& ai_executable, const OthelloBoard& currentBoard, char player_char, int depth_ai1 , int depth_ai2) {
     std::string board_str = boardToString(currentBoard);
     int player_number = (player_char == PLAYER_X) ? 1 : 2; // ac.cpp/wa.cpp 預期 1 for X, 2 for O
 
@@ -291,10 +291,9 @@ std::string runAI(const std::string& ai_executable, const OthelloBoard& currentB
     // board_string (36個字元)
     // player_number (1 或 2)
     // depth
-    std::string ai_input_content = "1\n" +                   // t = 1
-                                   board_str + "\n" +
+    std::string ai_input_content = board_str + "\n" +
                                    std::to_string(player_number) + "\n" +
-                                   std::to_string(depth) + "\n";
+                                   std::to_string(((player_number==1)?depth_ai1:depth_ai2)) + "\n";
 
     std::string temp_input_filename = "temp_ai_input.txt";
     std::string temp_output_filename = "temp_ai_output.txt";

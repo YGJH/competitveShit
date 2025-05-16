@@ -1,5 +1,5 @@
 {
-  "workbench.colorTheme": "Theme",
+  "workbench.colorTheme": "Theme Mix",
   "clang-format.executable": "C:\\Program Files\\LLVM\\bin\\clang-format.exe",
   "editor.mouseWheelZoom": true,
   "[cpp]": {
@@ -166,7 +166,8 @@
     "xlocmes": "cpp",
     "xlocnum": "cpp",
     "xloctime": "cpp",
-    "xtr1common": "cpp"
+    "xtr1common": "cpp",
+    "queue": "cpp"
   },
   "cmake.configureOnOpen": false
 }

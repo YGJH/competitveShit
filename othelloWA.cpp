@@ -3,6 +3,13 @@
 #pragma G++ optimize(1, 2, 3, "Ofast", "inline")
 #pragma G++ optimize("O3,unroll-loops")
 #include <bits/stdc++.h>
+#include <thread>
+#include <atomic>
+#include <mutex>
+#include <vector>
+#include <queue>
+#include <functional>
+#include <condition_variable>
 using namespace std;
 #define int i64
 #define FF first
@@ -174,13 +181,6 @@ void find_next(queue<pair<int, int>> &que, const char player,
 			}
 		}
 	}
-	// auto tt = que;
-	// while(tt.empty() == 0) {
-	// 	auto [yt,xt] = tt.front();tt.pop();
-	// 	cerr << "(" << yt << ", " << xt << ")" << '\n';
-	// }
-	// cerr << '\n';
-
 
 	return ;
 
@@ -192,64 +192,131 @@ struct node {
 vector<node> ans_out;
 int ans_depth;
 char rootPlayer;
-int bfs(const char player, const int depth,
-		const bool status) { // status == true is max
-	vector<vector<int>> value(6, vector<int>(6, 0));
-	queue<pair<int, int>> que;
-	// de(depth);
-	if (depth <= 0) {
 
-		find_next(que, player , value);
-		int ret = INT32_MIN;
-		for(int i = 0 ; i < 6 ; i++) {
-			for(int j = 0 ; j < 6 ; j++) {
-				if(value[i][j] != 0) {
-					ret = max(ret , value[i][j]);
-				}
-			}
-		}
-		if(ret == INT32_MIN) ret = 0 ;
-		return (status)?ret:-ret;
-	} else {
-		find_next(que, player , value);
-		int ret = (status)?INT32_MIN:INT32_MAX;
-		const char opisChar = (player=='O')?'X':'O';
-		if(que.empty()) {
-			int score = bfs(opisChar , depth-1 , !status);
-			return score;
-		}
-		while(que.empty()==0) {
-			auto &[y,x] = que.front();que.pop();
-			queue<pair<int,int>> modified;
-			
-			modify(player , y , x , modified);
-			board[y][x] = player;
-			// std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-			int score = bfs(opisChar , depth - 1 , !status);
-			while(modified.empty() == 0 ) {
-				auto &[nr,nc] = modified.front() ; modified.pop();
-				board[nr][nc] = opisChar;
-			}
-			board[y][x] = '+';
+class ThreadPool {
+public:
+    ThreadPool(size_t numThreads) {
+        for (size_t i = 0; i < numThreads; ++i) {
+            workers.emplace_back([this]() {
+                while (true) {
+                    std::function<void()> task;
 
-			if(depth == ans_depth) {
-				ans[y][x] = score + value[y][x];
-			}
-			if(status) {
-				if(ret < score + value[y][x]) {
-					ret = score + value[y][x];
-				}
-			} else {
-				if(ret > score - value[y][x]) {
-					ret = score - value[y][x];
-				}
-			}
-		}
-		// if(player == rootPlayer)
-		// 	ans_out.push_back({besty , bestx , ret});		
-		if(ret <= INT32_MIN/2 || ret >= INT32_MAX/2) ret = 0 ;
-		return ret ;
-	}
+                    // 取得任務
+                    {
+                        std::unique_lock<std::mutex> lock(queueMutex);
+                        condition.wait(lock, [this]() { return stop || !tasks.empty(); });
+                        if (stop && tasks.empty()) return;
+                        task = std::move(tasks.front());
+                        tasks.pop();
+                    }
+
+                    // 執行任務
+                    task();
+                }
+            });
+        }
+    }
+
+    ~ThreadPool() {
+        {
+            std::unique_lock<std::mutex> lock(queueMutex);
+            stop = true;
+        }
+        condition.notify_all();
+        for (std::thread &worker : workers) {
+            worker.join();
+        }
+    }
+
+    void enqueue(std::function<void()> task) {
+        {
+            std::unique_lock<std::mutex> lock(queueMutex);
+            tasks.push(std::move(task));
+        }
+        condition.notify_one();
+    }
+
+private:
+    std::vector<std::thread> workers;
+    std::queue<std::function<void()>> tasks;
+    std::mutex queueMutex;
+    std::condition_variable condition;
+    bool stop = false;
+};
+
+int bfs(const char player, const int depth, const bool status) {
+    vector<vector<int>> value(6, vector<int>(6, 0));
+    queue<pair<int, int>> que;
+
+    if (depth <= 0) {
+        find_next(que, player, value);
+        int ret = INT32_MIN;
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                if (value[i][j] != 0) {
+                    ret = max(ret, value[i][j]);
+                }
+            }
+        }
+        if (ret == INT32_MIN) ret = 0;
+        return (status) ? ret : -ret;
+    } else {
+        find_next(que, player, value);
+        int ret = (status) ? INT32_MIN : INT32_MAX;
+        const char opisChar = (player == 'O') ? 'X' : 'O';
+
+        if (que.empty()) {
+            int score = bfs(opisChar, depth - 1, !status);
+            return score;
+        }
+
+        // --- 使用執行緒池 ---
+        ThreadPool threadPool(std::thread::hardware_concurrency()/2);
+        std::mutex ret_mutex;
+
+        while (!que.empty()) {
+            auto [y, x] = que.front();
+            que.pop();
+
+            threadPool.enqueue([&, y, x]() {
+                // 建立本地棋盤副本
+                vector<vector<char>> local_board = board;
+                queue<pair<int, int>> modified;
+
+                // 修改本地棋盤
+                modify(player, y, x, modified);
+                local_board[y][x] = player;
+
+                // 執行遞迴 BFS
+                int score = bfs(opisChar, depth - 1, !status);
+
+                // 回滾本地棋盤（不影響全域棋盤）
+                while (!modified.empty()) {
+                    auto [nr, nc] = modified.front();
+                    modified.pop();
+                    local_board[nr][nc] = opisChar;
+                }
+
+                // 更新 `ret`，需要加鎖
+                {
+                    std::lock_guard<std::mutex> lock(ret_mutex);
+                    if (status) {
+                        ret = max(ret, score + value[y][x]);
+                    } else {
+                        ret = min(ret, score - value[y][x]);
+                    }
+                }
+
+                // 如果是根深度，更新 `ans`
+                if (depth == ans_depth) {
+                    ans[y][x] = score + value[y][x];
+                }
+            });
+        }
+
+        if (ret <= INT32_MIN / 2 || ret >= INT32_MAX / 2) ret = 0;
+        return ret;
+    }
 }
 
 void solve() {
@@ -275,13 +342,11 @@ void solve() {
 	int y = 0 , x = 0 ;
 	for(int i = 0 ; i < 6 ; ++i) {
 		for(int j = 0 ; j < 6 ; ++j) {
-			// cout << ((ans[i][j] == -1e18)?0:ans[i][j]) << ' ';
 			if(out < ans[i][j]) {
 				out = ans[i][j];
 				y = i; x = j;
 			}
 		}
-		// cout << '\n';
 	}
 	cout << '[' << aa[y] << aaa[x] << "]\n";
 	return;
@@ -291,10 +356,6 @@ signed main() {
 	ios_base::sync_with_stdio(0);
 	cin.tie(0);
 	cout.tie(0);
-	int t;
-	cin >> t;
-	while (t--) {
-		solve();
-	}
+	solve();
 	return 0;
 }

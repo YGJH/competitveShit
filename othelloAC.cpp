@@ -224,7 +224,6 @@ int bfs(const char player, const int depth,
 			
 			modify(player , y , x , modified);
 			board[y][x] = player;
-			// std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 			int score = bfs(opisChar , depth - 1 , !status);
 			while(modified.empty() == 0 ) {
 				auto &[nr,nc] = modified.front() ; modified.pop();
@@ -249,8 +248,6 @@ int bfs(const char player, const int depth,
 				}
 			}
 		}
-		// if(player == rootPlayer)
-		// 	ans_out.push_back({besty , bestx , ret});		
 		if(ret <= INT32_MIN/2 || ret >= INT32_MAX/2) ret = 0 ;
 		return ret;
 	}
@@ -293,10 +290,6 @@ signed main() {
 	ios_base::sync_with_stdio(0);
 	cin.tie(0);
 	cout.tie(0);
-	int t;
-	cin >> t;
-	while (t--) {
-		solve();
-	}
+	solve();
 	return 0;
 }
