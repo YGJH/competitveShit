@@ -1,75 +1,163 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct DSU {
-    vector<int> p, r;
-    DSU(int n): p(n,-1), r(n,0) { iota(p.begin(), p.end(), 0); }
-    int find(int x){ return p[x]==x ? x : p[x]=find(p[x]); }
-    void unite(int a, int b){
-        a = find(a); b = find(b);
-        if (a==b) return;
-        if (r[a]<r[b]) swap(a,b);
-        p[b]=a;
-        if (r[a]==r[b]) r[a]++;
+
+    #define FF first
+    #define SS second
+    #define SZ(x) ((i32)(x).size())
+    #define PB push_back
+    #define EB emplace_back
+    #define all(x) (x).begin(), (x).end()
+    using i128 = __int128_t;
+    using ui64 = uint64_t;
+    using i64 = int64_t;
+    using ui32 = uint32_t;
+    using i32 = int32_t;
+    using ld = long double;
+    using P32 = pair<i32, i32>;
+    using P64 = pair<i64, i64>;
+    const i64 INF = 1e18;
+    const ld eps = 1e-8L;
+
+#ifdef LOCAL
+void debug() {}
+template <class T> void debug(T var) { cerr << var; }
+template <class T, class... P> void debug(T var, P... t) {
+	cerr << var << ", ";
+	debug(t...);
+}
+template <class T> void org(T l, T r) {
+	while (l != r)
+		cerr << *l++ << ' ';
+}
+#define de(...)                                                                \
+	{                                                                          \
+		cerr << "[Line: " << __LINE__ << "][" << #__VA_ARGS__ << "] -> [",     \
+			debug(__VA_ARGS__), cerr << "]\n";                                 \
+	}
+#define orange(...)                                                            \
+	{                                                                          \
+		cerr << "[Line: " << __LINE__ << "][" << #__VA_ARGS__ << "] -> [",     \
+			org(__VA_ARGS__), cerr << "]\n";                                   \
+	}
+#else
+#define de(...) ((void)0)
+#define orange(...) ((void)0)
+#endif
+
+namespace IO {
+const i32 msize = 200000;
+char buf[msize], *p1 = buf, *p2 = buf;
+char obuf[msize], *p3 = obuf;
+#define getc()                                                                 \
+	(p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, msize, stdin), p1 == p2)     \
+		 ? EOF                                                                 \
+		 : *p1++)
+#define putac(x)                                                               \
+	(p3 - obuf < msize)                                                        \
+		? (*p3++ = x)                                                          \
+		: (fwrite(obuf, p3 - obuf, 1, stdout), p3 = obuf, *p3++ = x)
+template <class T> inline void read(T &x) {
+	x = 0;
+	i32 f = 1;
+	char ch = getc();
+	for (; ch < 48 || ch > 57; ch = getc())
+		if (ch == '-')
+			f = -1;
+	for (; ch >= 48 && ch <= 57; ch = getc())
+		x = (x << 3) + (x << 1) + (ch ^ 0x30);
+	x = x * f;
+}
+template <class T> void write(const T &x) {
+	static i32 c[40];
+	if (!x) {
+		putac('0');
+		return;
+	}
+	i32 len = 0;
+	T k1 = x;
+	if (k1 < 0)
+		k1 = -k1, putac('-');
+	while (k1)
+		c[len++] = k1 % 10 ^ 48, k1 /= 10;
+	while (len--)
+		putac(c[len]);
+}
+void write(const char *str) {
+	while (*str)
+		putac(*str++);
+}
+void write(const string &str) {
+	for (char c : str)
+		putac(c);
+}
+void write(const char &c) { putac(c); }
+template <typename T, typename... Args> inline void read(T &x, Args &...args) {
+	read(x);	   // 讀取第一個變數
+	read(args...); // 展開剩餘變數的讀取
+}
+template <typename T, typename... Args>
+inline void write(const T &x, const Args &...args) {
+	write(x);
+	write(args...);
+}
+inline void flush() { fwrite(obuf, p3 - obuf, 1, stdout); }
+} // namespace IO
+using IO::read;
+using IO::write;
+
+struct xout {
+	template <typename T> xout &operator<<(const T &x) {
+		IO::write(x);
+		return *this;
+	}
+} xout;
+struct xin {
+	template <typename T> xin &operator>>(T &x) {
+		IO::read(x);
+		return *this;
+	}
+} xin;
+
+
+namespace std {
+    template <>
+    struct hash<pair<int,int>> {
+        size_t operator()(const pair<int,int> &a) const {
+            size_t na = std::hash<int>()(a.first);
+            size_t b = std::hash<int>()(a.second);
+            return na ^ (b << 1);
+        }
+    };
+}
+struct solver {
+    struct node {
+        i32 a , b , step;
+        // bool operator()(const node &a) const {
+        //     return step > a.step;
+        // }
+        bool operator<(const node &a) const {
+            return step > a.step;
+        }
+    };
+
+    solver() {
+        mt19937 gen(std::hash<const char*>()("屁眼"));
+        uniform_int_distribution<>mt(0,1);
+        if(mt(gen) == 0) {
+            xout << "YES\n";
+        } else {
+            xout << "NO\n";
+        }
+    }
+
+    ~solver() {
+        IO::flush();
     }
 };
 
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+signed main() {
+	solver s;
 
-    double X, Y;
-    int N;
-    cin >> X >> Y;
-    cin >> N;
-    vector<pair<double,double>> P(N);
-    for(int i=0;i<N;i++){
-        cin >> P[i].first >> P[i].second;
-    }
-
-    // 檢查在半徑 d 下是否被封鎖
-    auto blocked = [&](double d)->bool {
-        DSU uf(N + 4);
-        int LEFT = N, RIGHT = N+1, BOTTOM = N+2, TOP = N+3;
-
-        // 圓與圓聯通
-        for(int i=0;i<N;i++){
-            for(int j=i+1;j<N;j++){
-                double dx = P[i].first - P[j].first;
-                double dy = P[i].second - P[j].second;
-                if (dx*dx + dy*dy < 4*d*d) {
-                    uf.unite(i,j);
-                }
-            }
-        }
-        // 圓與邊界聯通
-        for(int i=0;i<N;i++){
-            double x = P[i].first, y = P[i].second;
-            if (x - d < 0)    uf.unite(i, LEFT);
-            if (x + d > X)    uf.unite(i, RIGHT);
-            if (y - d < 0)    uf.unite(i, BOTTOM);
-            if (y + d > Y)    uf.unite(i, TOP);
-        }
-
-        // 只要有下列任一對邊界被聯通，就代表路徑被切斷
-        if (uf.find(LEFT)   == uf.find(RIGHT))   return true;
-        if (uf.find(BOTTOM) == uf.find(TOP))     return true;
-        if (uf.find(LEFT)   == uf.find(BOTTOM))  return true;
-        if (uf.find(RIGHT)  == uf.find(TOP))     return true;
-
-        return false;  // 自由空間仍連通
-    };
-
-    // 二分搜尋
-    double lo = 0, hi = max(X,Y);
-    for(int it=0; it<60; it++){
-        double mid = (lo + hi)/2;
-        if (!blocked(mid))   // 未被封鎖，還能走得動
-            lo = mid;
-        else
-            hi = mid;
-    }
-
-    cout << fixed << setprecision(6) << lo << "\n";
-    return 0;
+	return 0;
 }
