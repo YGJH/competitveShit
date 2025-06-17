@@ -1,26 +1,24 @@
-#pragma GCC optimize(1, 2, 3, "Ofast", "inline")
-#pragma GCC optimize("O3,unroll-loops")
-#pragma G++ optimize(1, 2, 3, "Ofast", "inline")
-#pragma G++ optimize("O3,unroll-loops")
 #include <bits/stdc++.h>
 using namespace std;
-#define int i64
-#define FF first
-#define SS second
-#define SZ(x) ((i32)(x).size())
-#define PB push_back
-#define EB emplace_back
-#define all(x) (x).begin(), (x).end()
-using i128 = __int128_t;
-using ui64 = uint64_t;
-using i64 = int64_t;
-using ui32 = uint32_t;
-using i32 = int32_t;
-using ld = long double;
-using P32 = pair<i32, i32>;
-using P64 = pair<i64, i64>;
-const i64 INF = 1e18;
-const ld eps = 1e-8L;
+
+
+    #define FF first
+    #define SS second
+    #define SZ(x) ((i32)(x).size())
+    #define PB push_back
+    #define EB emplace_back
+    #define all(x) (x).begin(), (x).end()
+    using i128 = __int128_t;
+    using ui64 = uint64_t;
+    using i64 = int64_t;
+    using ui32 = uint32_t;
+    using i32 = int32_t;
+    using ld = long double;
+    using P32 = pair<i32, i32>;
+    using P64 = pair<i64, i64>;
+    const i64 INF = 1e18;
+    const ld eps = 1e-8L;
+
 #ifdef LOCAL
 void debug() {}
 template <class T> void debug(T var) { cerr << var; }
@@ -48,7 +46,7 @@ template <class T> void org(T l, T r) {
 #endif
 
 namespace IO {
-const i32 msize = 2000000;
+const i32 msize = 200000;
 char buf[msize], *p1 = buf, *p2 = buf;
 char obuf[msize], *p3 = obuf;
 #define getc()                                                                 \
@@ -94,9 +92,9 @@ void write(const string &str) {
 		putac(c);
 }
 void write(const char &c) { putac(c); }
-template <typename T, typename... Args> inline void read(T &a, Args &...args) {
-	read(a);	   // 讀取第一個變數
-	read(args...); // 讀取第一個變數
+template <typename T, typename... Args> inline void read(T &x, Args &...args) {
+	read(x);	   // 讀取第一個變數
+	read(args...); // 展開剩餘變數的讀取
 }
 template <typename T, typename... Args>
 inline void write(const T &x, const Args &...args) {
@@ -107,44 +105,59 @@ inline void flush() { fwrite(obuf, p3 - obuf, 1, stdout); }
 } // namespace IO
 using IO::read;
 using IO::write;
-void solve();
+
+struct xout {
+	template <typename T> xout &operator<<(const T &x) {
+		IO::write(x);
+		return *this;
+	}
+} xout;
+struct xin {
+	template <typename T> xin &operator>>(T &x) {
+		IO::read(x);
+		return *this;
+	}
+} xin;
+
+
+namespace std {
+    template <>
+    struct hash<pair<int,int>> {
+        size_t operator()(const pair<int,int> &a) const {
+            size_t na = std::hash<int>()(a.first);
+            size_t b = std::hash<int>()(a.second);
+            return na ^ (b << 1);
+        }
+    };
+}
+struct solver {
+    struct node {
+        i32 a , b , step;
+        // bool operator()(const node &a) const {
+        //     return step > a.step;
+        // }
+        bool operator<(const node &a) const {
+            return step > a.step;
+        }
+    };
+
+    solver() {
+        mt19937 gen(std::hash<const char*>()("屁眼"));
+        uniform_int_distribution<>mt(0,1);
+        if(mt(gen) == 0) {
+            xout << "YES\n";
+        } else {
+            xout << "NO\n";
+        }
+    }
+
+    ~solver() {
+        IO::flush();
+    }
+};
 
 signed main() {
-	int t = 1;
-	while (t--)
-		solve();
-	IO::flush();
+	solver s;
+
 	return 0;
-}
-vector<int> dp((1 << 20), INF);
-vector<int> weight((1 << 20), INF);
-void solve() {
-	int n, m;
-	read(n, m);
-	int V[1 + n];
-	for (int i = 0; i < n; i++) {
-		int tmp;
-		read(tmp);
-		V[i] = tmp;
-	}
-	
-	dp[0] = 0;
-	weight[0] = m;
-	for (int i = 1; i < (1 << n); i++) { // i = 1011
-		for(int j = 0 ; j < n ; j++) { // j = 1 now = 0011
-			if(!(i & (1<<j))) continue;
-			int pv = i ^ (1 << j); // pv = 0001
-			int a = weight[pv] , b = dp[pv];
-			if(a + V[j] > m) a = V[j], b++;
-			else a += V[j];
-			if(b == dp[i]) { 
-				weight[i] = min(a , weight[i]);
-				dp[i] = b;
-			} else if(b < dp[i]) {
-				dp[i] = b;
-				weight[i] = a;
-			}
-		}
-	}
-	write(dp[(1<<n)-1]);
 }

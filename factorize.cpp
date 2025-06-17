@@ -1,4 +1,3 @@
-// https://judge.yosupo.jp/problem/factorize
 #include <bits/stdc++.h>
 using namespace std;
 using ll = long long;

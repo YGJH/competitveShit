@@ -20,8 +20,6 @@
         "scope": "cpp",
         "prefix": "ddff",
         "body":[
-            "#define piyan puts(\"操我屁眼\");",
-            "#define fk puts(\"幹你娘幹你娘\");",
             "#define int i64",
             "#define FF first",
             "#define SS second",
