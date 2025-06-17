@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 clear
 
 # 檢查是否提供檔案名稱參數
@@ -17,7 +17,7 @@ fi
 
 if [ -z "$3" ]; then
     rm a.out
-    echo "編譯源碼檔案: $1"
+    # echo "編譯源碼檔案: $1"
     g++ $1 -O3 -w -Wfatal-errors -Wall -Wshadow -fsanitize=undefined -DLOCAL
     # execTime = $( {time ./a.out < ${in} } )
     # echo "${execTime}"
@@ -25,7 +25,7 @@ if [ -z "$3" ]; then
 else
     out="$3"
     rm a.out
-    echo "編譯源碼檔案: $1"
+    # echo "編譯源碼檔案: $1"
     g++ $1 -O3 -w -Wfatal-errors -Wall -Wshadow -fsanitize=undefined -DLOCAL
     execTime=$( { time ./a.out < "${in}" > "${out}"; } 2>&1 )
     echo "${execTime}"

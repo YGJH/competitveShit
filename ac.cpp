@@ -1,118 +1,150 @@
-#include<iostream>
-#include<cstring>
-#include<set>
-#include<map>
-#include<functional>
-#include<vector>
-#include<queue>
-#include<math.h>
-#include<algorithm>
+#pragma GCC optimize(1, 2, 3, "Ofast", "inline")
+#pragma GCC optimize("O3,unroll-loops")
+#pragma G++ optimize(1, 2, 3, "Ofast", "inline")
+#pragma G++ optimize("O3,unroll-loops")
+#include <bits/stdc++.h>
 using namespace std;
-typedef long long ll;
-typedef pair<int,int> pii;
-#define lson u<<1
-#define rson u<<1|1
-#define IOS ios::sync_with_stdio(0);cin.tie(nullptr)
-const int N=5e4+10; 
-struct node{
-    int l,r;
-    int sum;
-    int tag;    
-}tr[N<<2];
-void pushup(int u){
-    tr[u].sum=tr[lson].sum+tr[rson].sum;
+#define int i64
+#define FF first
+#define SS second
+#define SZ(x) ((i32)(x).size())
+#define PB push_back
+#define EB emplace_back
+#define all(x) (x).begin(), (x).end()
+using i128 = __int128_t;
+using ui64 = uint64_t;
+using i64 = int64_t;
+using ui32 = uint32_t;
+using i32 = int32_t;
+using ld = long double;
+using P32 = pair<i32, i32>;
+using P64 = pair<i64, i64>;
+const i64 INF = 1e18;
+const ld eps = 1e-8L;
+#ifdef LOCAL
+void debug() {}
+template <class T> void debug(T var) { cerr << var; }
+template <class T, class... P> void debug(T var, P... t) {
+	cerr << var << ", ";
+	debug(t...);
 }
-void build(int l,int r,int u=1){
-    tr[u].l=l,tr[u].r=r;
-    tr[u].sum=0;tr[u].tag=-1;
-    if(l==r) return;
-    int mid=l+r>>1;
-    build(l,mid,lson);
-    build(mid+1,r,rson);
+template <class T> void org(T l, T r) {
+	while (l != r)
+		cerr << *l++ << ' ';
 }
-void pushdown(int u){
-    if(tr[u].tag==-1) return;
-    tr[lson].sum=(tr[lson].r-tr[lson].l+1)*tr[u].tag;
-    tr[rson].sum=(tr[rson].r-tr[rson].l+1)*tr[u].tag;
-    tr[lson].tag=tr[rson].tag=tr[u].tag;
-    tr[u].tag=-1;
-}
-void update(int l,int r,int x,int u=1){
-    if(tr[u].l>=l && tr[u].r<=r){
-        tr[u].tag=x;
-        tr[u].sum=(tr[u].r-tr[u].l+1)*x;
-        return;
-    }
-    pushdown(u);
-    int mid=tr[u].l+tr[u].r>>1;
-    if(mid>=l) update(l,r,x,lson);
-    if(mid+1<=r) update(l,r,x,rson);
-    pushup(u);
-}
-int query(int l,int r,int u=1){
-    if(tr[u].l>=l && tr[u].r<=r){
-        return tr[u].sum;
-    }
-    pushdown(u);
-    int mid=tr[u].l+tr[u].r>>1;
-    int res=0;
-    if(mid>=l) res+=query(l,r,lson);
-    if(mid+1<=r) res+=query(l,r,rson);
-    return res;
-}
-int findlast(int l,int r,int y){
-    if(l==r) return r;
-    int mid=l+r>>1;
-    int tsum=query(l,mid);
-    if(mid-l+1-tsum>=y){
-        return findlast(l,mid,y);
-    }
-    else{
-        return findlast(mid+1,r,y-(mid-l+1-tsum));  
-    }
-}
-int n,m;
-void solve(){
-    cin>>n>>m;
-    build(1,n);
-    while(m--){
-        int opt,x,y;
-        cin>>opt>>x>>y;
-        if(opt==1){
-            x++;
-            int p=-1;
-            int sum=query(x,n);
-            if(sum==n-x+1){
-                cout<<"Can not put any one."<<'\n';
-            }
-            else if(sum>=n-x+1-y){
-                int s=findlast(x,n,1);
-                int e=findlast(x,n,n-x+1-sum);
-                update(s,e,1);
-                s--;e--;
-                cout<<s<<" "<<e<<'\n';
-            }
-            else{
-                int s,e;
-                s=findlast(x,n,1);
-                e=findlast(s,n,y);
-                update(s,e,1);
-                s--;e--;
-                cout<<s<<' '<<e<<'\n';
-            }
-        }
-        else{
-            x++;y++;
-            cout<<query(x,y)<<'\n';
-            update(x,y,0);
-        }
-    }
-    cout<<'\n';
-}
+#define de(...)                                                                \
+	{                                                                          \
+		cerr << "[Line: " << __LINE__ << "][" << #__VA_ARGS__ << "] -> [",     \
+			debug(__VA_ARGS__), cerr << "]\n";                                 \
+	}
+#define orange(...)                                                            \
+	{                                                                          \
+		cerr << "[Line: " << __LINE__ << "][" << #__VA_ARGS__ << "] -> [",     \
+			org(__VA_ARGS__), cerr << "]\n";                                   \
+	}
+#else
+#define de(...) ((void)0)
+#define orange(...) ((void)0)
+#endif
 
-int main(){
-    IOS;
-    int t;
-    cin>>t;
-    while(t--)solve();
+namespace IO {
+const i32 msize = 2000000;
+char buf[msize], *p1 = buf, *p2 = buf;
+char obuf[msize], *p3 = obuf;
+#define getc()                                                                 \
+	(p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, msize, stdin), p1 == p2)     \
+		 ? EOF                                                                 \
+		 : *p1++)
+#define putac(x)                                                               \
+	(p3 - obuf < msize)                                                        \
+		? (*p3++ = x)                                                          \
+		: (fwrite(obuf, p3 - obuf, 1, stdout), p3 = obuf, *p3++ = x)
+template <class T> inline void read(T &x) {
+	x = 0;
+	i32 f = 1;
+	char ch = getc();
+	for (; ch < 48 || ch > 57; ch = getc())
+		if (ch == '-')
+			f = -1;
+	for (; ch >= 48 && ch <= 57; ch = getc())
+		x = (x << 3) + (x << 1) + (ch ^ 0x30);
+	x = x * f;
+}
+template <class T> void write(const T &x) {
+	static i32 c[40];
+	if (!x) {
+		putac('0');
+		return;
+	}
+	i32 len = 0;
+	T k1 = x;
+	if (k1 < 0)
+		k1 = -k1, putac('-');
+	while (k1)
+		c[len++] = k1 % 10 ^ 48, k1 /= 10;
+	while (len--)
+		putac(c[len]);
+}
+void write(const char *str) {
+	while (*str)
+		putac(*str++);
+}
+void write(const string &str) {
+	for (char c : str)
+		putac(c);
+}
+void write(const char &c) { putac(c); }
+template <typename T, typename... Args> inline void read(T &a, Args &...args) {
+	read(a);	   // 讀取第一個變數
+	read(args...); // 讀取第一個變數
+}
+template <typename T, typename... Args>
+inline void write(const T &x, const Args &...args) {
+	write(x);
+	write(args...);
+}
+inline void flush() { fwrite(obuf, p3 - obuf, 1, stdout); }
+} // namespace IO
+using IO::read;
+using IO::write;
+void solve();
+
+signed main() {
+	int t = 1;
+	while (t--)
+		solve();
+	IO::flush();
+	return 0;
+}
+vector<int> dp((1 << 20), INF);
+vector<int> weight((1 << 20), INF);
+void solve() {
+	int n, m;
+	read(n, m);
+	int V[1 + n];
+	for (int i = 0; i < n; i++) {
+		int tmp;
+		read(tmp);
+		V[i] = tmp;
+	}
+	
+	dp[0] = 0;
+	weight[0] = m;
+	for (int i = 1; i < (1 << n); i++) { // i = 1011
+		for(int j = 0 ; j < n ; j++) { // j = 1 now = 0011
+			if(!(i & (1<<j))) continue;
+			int pv = i ^ (1 << j); // pv = 0001
+			int a = weight[pv] , b = dp[pv];
+			if(a + V[j] > m) a = V[j], b++;
+			else a += V[j];
+			if(b == dp[i]) { 
+				weight[i] = min(a , weight[i]);
+				dp[i] = b;
+			} else if(b < dp[i]) {
+				dp[i] = b;
+				weight[i] = a;
+			}
+		}
+	}
+	write(dp[(1<<n)-1]);
 }

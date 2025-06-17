@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 clear
 # 編譯程式，並檢查是否成功
 if ! g++ -std=c++17 -O3 -Wfatal-errors ac.cpp -o ac; then
